@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\marti\\source\\repos\\Guessero\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}|guessero.client\\guessero.client.esproj|c:\\users\\marti\\source\\repos\\guessero\\guessero.client\\src\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}|guessero.client\\guessero.client.esproj|solutionrelative:guessero.client\\src\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 327,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "index.html",
+              "DocumentMoniker": "C:\\Users\\marti\\source\\repos\\Guessero\\guessero.client\\src\\index.html",
+              "RelativeDocumentMoniker": "guessero.client\\src\\index.html",
+              "ToolTip": "C:\\Users\\marti\\source\\repos\\Guessero\\guessero.client\\src\\index.html",
+              "RelativeToolTip": "guessero.client\\src\\index.html",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2024-12-15T15:56:35.097Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

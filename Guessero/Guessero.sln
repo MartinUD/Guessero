@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guessero.Server", "Guessero.Server\Guessero.Server.csproj", "{BD00F513-52FE-485B-99CC-D4B0749939E0}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "guessero.client", "guessero.client\guessero.client.esproj", "{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD00F513-52FE-485B-99CC-D4B0749939E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD00F513-52FE-485B-99CC-D4B0749939E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD00F513-52FE-485B-99CC-D4B0749939E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD00F513-52FE-485B-99CC-D4B0749939E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C849E9F-4FA4-4131-AE86-F01DE1ADFD4D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {006D20E4-106A-47A3-A395-4635840AB8C0}
+	EndGlobalSection
+EndGlobal
