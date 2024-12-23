@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 interface TestResponse {
@@ -15,8 +15,15 @@ export class BasicService {
   constructor(private http: HttpClient) { }
 
   getData(): Observable<string> {
-    return this.http.get<TestResponse>(this.apiUrl).pipe(
-      map(response => response.message)
-    );
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    });
+
+    return this.http
+      .get<TestResponse>(this.apiUrl, { headers })
+      .pipe(
+        map((response: TestResponse) => response.message)
+      );
   }
 }
