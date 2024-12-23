@@ -1,10 +1,10 @@
-interface PartyMember {
+export interface PartyMember {
     id: string;
     name?: string;
     isHost?: boolean;
 }
 
-class Party {
+ export class Party {
     private partyId: string;
     private members: PartyMember[];
     private isPrivate: boolean;
@@ -28,9 +28,4 @@ class Party {
         return [...this.members];
     }
 }
-
-const testParty = new Party('party123');
-testParty.addMember({ id: 'user1', name : 'Alice' });
-testParty.addMember({ id: 'user2', name : 'Bob' });
-console.log(testParty.getMembers());
 
