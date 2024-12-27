@@ -18,6 +18,19 @@ Deno.serve((_req) => {
       });
 
       socket.addEventListener("close", () => {
+        const userId = websocketUserMap.get(socket);
+        if (userId) {
+          for (const [partyId, party] of parties.entries()) {
+            const member = party.getMembers().find((member) => member.id === userId);
+            if (member) {
+              party.removeMember(userId);
+              if (party.getMembers().length === 0) {
+                parties.delete(partyId);
+                console.log(`Party deleted with ID: ${partyId}`);
+              }
+            }
+          }
+        }
         console.log("a client disconnected!");
       });
 
@@ -61,31 +74,32 @@ Deno.serve((_req) => {
 
   function handleCreateParty (socket: WebSocket, payload: {partyId: string, username: string}, memberId: string) {
 
+    const { partyId, username } = payload;
+
     if (!payload || !payload.partyId || !payload.username) {
       socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
       return;
     }
 
-    const { partyId, username } = payload;
-      if (parties.has(partyId)) {
-          socket.send(JSON.stringify({ type: "error", message: "Party already exists"}));
-          return;
-      }
-        const party = new Party(partyId);
+    if (parties.has(partyId)) {
+        socket.send(JSON.stringify({ type: "error", message: "Party already exists"}));
+        return;
+    }
+      const party = new Party(partyId);
 
-        party.addMember({ id: memberId, username: username, isHost: true });
+      party.addMember({ id: memberId, username: username, isHost: true });
 
-        parties.set(partyId, party);
+      parties.set(partyId, party);
 
-        socket.send(
-            JSON.stringify({
-              type: "party_created",
-              partyId,
-              members: party.listMembers(),
-            })
-          );
+      socket.send(
+          JSON.stringify({
+            type: "party_created",
+            partyId,
+            members: party.listMembers(),
+          })
+        );
 
-        console.log(`Party created with ID: [${partyId}] by member: ${username} (${memberId})`);
+      console.log(`Party created with ID: [${partyId}] by member: ${username} (${memberId})`);
   }
 
   function handleLeaveParty (socket: WebSocket, payload: {partyId: string}, memberId: string) {
