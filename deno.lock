@@ -15,7 +15,8 @@
     "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/path@1": "1.0.8",
     "npm:@types/node@*": "22.5.4",
-    "npm:path-to-regexp@6.2.1": "6.2.1"
+    "npm:path-to-regexp@6.2.1": "6.2.1",
+    "npm:wordnet-db@*": "3.1.14"
   },
   "jsr": {
     "@oak/commons@1.0.0": {
@@ -92,6 +93,9 @@
     },
     "undici-types@6.19.8": {
       "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
+    },
+    "wordnet-db@3.1.14": {
+      "integrity": "sha512-zVyFsvE+mq9MCmwXUWHIcpfbrHHClZWZiVOzKSxNJruIcFn2RbY55zkhiAMMxM8zCVSmtNiViq8FsAZSFpMYag=="
     }
   },
   "redirects": {

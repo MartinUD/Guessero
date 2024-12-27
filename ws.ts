@@ -73,19 +73,19 @@ Deno.serve((_req) => {
   });
 
   function handleCreateParty (socket: WebSocket, payload: {partyId: string, username: string}, memberId: string) {
-
     const { partyId, username } = payload;
-
+    
     if (!payload || !payload.partyId || !payload.username) {
       socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
       return;
     }
 
-    if (parties.has(partyId)) {
-        socket.send(JSON.stringify({ type: "error", message: "Party already exists"}));
-        return;
-    }
-      const party = new Party(partyId);
+    
+      if (parties.has(partyId)) {
+          socket.send(JSON.stringify({ type: "error", message: "Party already exists"}));
+          return;
+      }
+        const party = new Party(partyId);
 
       party.addMember({ id: memberId, username: username, isHost: true });
 
