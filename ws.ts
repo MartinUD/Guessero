@@ -1,8 +1,10 @@
 import { Party } from "./partySystem.ts";
 
 const parties = new Map<string, Party>();
+const websocketUserMap = new WeakMap<WebSocket, string>();
 
 Deno.serve((_req) => {
+
     if (_req.headers.get("upgrade") != "websocket") {
         return new Response(null, { status: 501 });
       }
@@ -10,7 +12,9 @@ Deno.serve((_req) => {
       const { socket, response } = Deno.upgradeWebSocket(_req);
 
       socket.addEventListener("open", () => {
-        console.log("a client connected!");
+        const assignedUserId = crypto.randomUUID();
+        websocketUserMap.set(socket, assignedUserId);
+        console.log("a new client connected with ID:", assignedUserId);
       });
 
       socket.addEventListener("close", () => {
@@ -21,10 +25,23 @@ Deno.serve((_req) => {
 
         try {
             const message = JSON.parse(event.data);
+            const userId = websocketUserMap.get(socket);
 
+            if (!userId) {
+              socket.send(JSON.stringify({ type: "error", message: "Unauthorized" }));
+              return;
+            }
             switch (message.type) {
                 case "create_party":
-                    handleCraeteParty(socket, message.payload);
+                    handleCreateParty(socket, message.payload, userId);
+                    break;
+
+                case "leave_party":
+                    handleLeaveParty(socket, message.payload, userId);
+                    break;
+
+                case "list_parties":
+                    handleListParties(socket);
                     break;
                 default:
                     socket.send(JSON.stringify({ type: "error", message: "Unknown"}));
@@ -42,15 +59,21 @@ Deno.serve((_req) => {
       return response;
   });
 
-  function handleCraeteParty (socket: WebSocket, payload: any) {
-    const { partyId, memberId, name } = payload;
+  function handleCreateParty (socket: WebSocket, payload: {partyId: string, username: string}, memberId: string) {
+
+    if (!payload || !payload.partyId || !payload.username) {
+      socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
+      return;
+    }
+
+    const { partyId, username } = payload;
       if (parties.has(partyId)) {
           socket.send(JSON.stringify({ type: "error", message: "Party already exists"}));
           return;
       }
         const party = new Party(partyId);
 
-        party.addMember({ id: memberId, name: name, isHost: true });
+        party.addMember({ id: memberId, username: username, isHost: true });
 
         parties.set(partyId, party);
 
@@ -58,11 +81,53 @@ Deno.serve((_req) => {
             JSON.stringify({
               type: "party_created",
               partyId,
-              members: party.getMembers(),
+              members: party.listMembers(),
             })
           );
 
-        console.log(`Party created with ID: ${partyId} by member: ${name} (${memberId})`);
+        console.log(`Party created with ID: [${partyId}] by member: ${username} (${memberId})`);
   }
 
+  function handleLeaveParty (socket: WebSocket, payload: {partyId: string}, memberId: string) {
+
+    if (!payload || !payload.partyId) {
+      socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
+      return;
+    }
+
+    const {partyId} = payload;
+
+    const party = parties.get(partyId);
+
+    if (!party) {
+        socket.send(JSON.stringify({ type: "error", message: "Party not found"}));
+        return;
+    }
+
+    const member = party.getMembers().find((member) => member.id === memberId);
+
+    if (!member) {
+      socket.send(JSON.stringify({ type: "error", message: "Member not found"}));
+      return;
+    }
+
+    party.removeMember(memberId);
+
+    if (party.getMembers().length === 0) {
+        parties.delete(partyId);
+        console.log(`Party deleted with ID: ${partyId}`);
+    }
+
+  }
+
+  function handleListParties(socket: WebSocket) {
+    const activeParties = [...parties.keys()];
+    socket.send(
+      JSON.stringify({
+        type: "party_list",
+        parties: activeParties,
+      })
+    );
+  }
+  
   //deno run --allow-net ws.ts
