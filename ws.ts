@@ -60,6 +60,11 @@ Deno.serve((_req) => {
         case "list_parties":
           handleListParties(socket);
           break;
+        
+        case "chat_message":
+          handleChatMessage(socket, message.payload, userId);
+          break;
+          
         default:
           socket.send(JSON.stringify({ type: "error", message: "Unknown" }));
           break;
@@ -76,7 +81,7 @@ Deno.serve((_req) => {
 });
 
 function handleCreateParty(socket: WebSocket, payload: { partyId: string; username: string }, memberId: string) {
-  const { partyId, username } = payload;
+  const { partyId, username} = payload;
 
   if (!payload || !payload.partyId || !payload.username) {
     socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
@@ -88,12 +93,11 @@ function handleCreateParty(socket: WebSocket, payload: { partyId: string; userna
   }
 
   const party = new Party(partyId);
+  socket.send(JSON.stringify({type: "party_created"}));
 
-  party.addMember({ id: memberId, username: username});
+  party.addMember({ id: memberId, username: username, socket: socket});
 
   parties.set(partyId, party);
-
-  socket.send(JSON.stringify({type: "party_created", partyId, members: party.listMembers()}));
 
   console.log(
     `Party created with ID: [${partyId}] by member: ${username} (${memberId})`,
@@ -117,7 +121,7 @@ function handleJoinParty(socket: WebSocket, payload: { partyId: string, username
     return;
   }
 
-  socket.send(party.addMember({ id: memberId, username: username, isHost: false }));
+  party.addMember({ id: memberId, username: username, socket: socket })
 }
 
 function handleLeaveParty(socket: WebSocket, payload: { partyId: string }, memberId: string) {
@@ -153,5 +157,22 @@ function handleListParties(socket: WebSocket) {
   const activeParties = [...parties.keys()];
   socket.send(JSON.stringify({type: "party_list", parties: activeParties,}),);
 }
+function handleChatMessage(socket: WebSocket, payload: { partyId: string, message: string }, memberId: string) {
+  const { partyId, message } = payload;
+  const party = parties.get(partyId);
+
+  if (!payload || !payload.partyId || !payload.message) {
+    socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
+    return;
+  }
+  if (!party) {
+    socket.send(JSON.stringify({ type: "error", message: "Party not found" }));
+    return;
+  }
+
+  party.chatMessage(memberId, message);
+}
+
+
 
 //deno run --allow-net ws.ts
