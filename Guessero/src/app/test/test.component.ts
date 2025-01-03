@@ -32,20 +32,6 @@ export class TestComponent implements OnInit {
     this.error = null;
     this.data = null;
 
-    this.basicService.getData().subscribe({
-      next: (response) => {
-        console.log('Received response:', response); // Debug log
-        this.data = response;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error details:', err); // Debug log
-        this.error = 'Failed to fetch data. Please try again later.';
-        this.loading = false;
-      },
-      complete: () => {
-        this.loading = false;
-      }
-    });
+    
   }
 }

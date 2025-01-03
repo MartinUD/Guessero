@@ -1,29 +1,87 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
-interface TestResponse {
-  message: string;
+export interface PartyMember {
+  id: string;
+  username?: string;
+  isHost?: boolean;
+}
+
+export interface PartyMessage {
+  type: string;
+  payload?: any;
+  message?: string;
+  partyId?: string;
+  members?: Omit<PartyMember, "id">[];
+  parties?: string[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class BasicService {
-  private apiUrl = 'http://localhost:8000/test';
+  private socket: WebSocket;
+  private parties$ = new BehaviorSubject<string[]>([]);
+  private members$ = new BehaviorSubject<Omit<PartyMember, "id">[]>([]);
+  private currentParty$ = new BehaviorSubject<string | null>(null);
 
-  constructor(private http: HttpClient) { }
-
-  getData(): Observable<string> {
-    const headers = new HttpHeaders({
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    });
-
-    return this.http
-      .get<TestResponse>(this.apiUrl, { headers })
-      .pipe(
-        map((response: TestResponse) => response.message)
-      );
+  constructor() {
+    this.socket = new WebSocket('ws://localhost:8000');
+    this.setupSocketListeners();
   }
-}
+
+  private setupSocketListeners(): void {
+    this.socket.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    this.socket.onmessage = (event) => {
+      const message: PartyMessage = JSON.parse(event.data);
+      
+      switch (message.type) {
+        case 'party_list':
+          this.parties$.next(message.parties || []);
+          console.log(this.parties$.getValue());
+          break;
+        case 'party_created':
+          this.currentParty$.next(message.partyId || null);
+          this.members$.next(message.members || []);
+          break;
+        case 'error':
+          console.error('WebSocket error:', message.message);
+          break;
+      }
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+  }
+
+  createParty(partyId: string, username: string): void {
+    this.socket.send(JSON.stringify({
+      type: 'create_party',
+      payload: { partyId, username }
+    }));
+  }
+
+  leaveParty(partyId: string): void {
+    this.socket.send(JSON.stringify({
+      type: 'leave_party',
+      payload: { partyId }
+    }));
+    this.currentParty$.next(null);
+    this.members$.next([]);
+  }
+
+  listParties(): void {
+    this.socket.send(JSON.stringify({
+      type: 'party_list'
+    })); 
+  }
+} 

@@ -1,9 +1,20 @@
 <div class="w-full h-full flex flex-col justify-center items-center">
-    <h1 class="text-7xl text-slate-50">Guessero</h1>
-    <div class="relative w-1/4 mt-4">
-        <input class="bg-transparent border-2 outline-none text-2xl border-zinc-400 py-4 pl-8 pr-12 rounded-full text-slate-50 w-full" type="text" placeholder="">
-        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-400 flex items-center justify-center">
+    <h1 class="text-[7rem] text-slate-50">Guessero</h1>
+    <div *ngIf="username" class="relative w-1/4 mt-4">
+        <input #inputPartyID class="bg-transparent border-2 outline-none text-2xl border-zinc-400 py-4 pl-8 pr-12 rounded-full text-slate-50 w-full" type="text" placeholder="">
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-400 flex items-center justify-center" (click)="createParty(inputPartyID.value)">
             <i class="fa-solid fa-chevron-right text-slate-50"></i>
         </button>
+    </div>
+    <div *ngIf="!username" class="flex flex-col items-center">
+        <h1 class="text-3xl text-slate-50 opacity-30 mt-[-2rem]">
+            Choose your username
+        </h1>
+        <div class="relative mt-4">
+            <input #inputUsername class="bg-transparent border-2 outline-none text-2xl border-zinc-400 py-4 pl-8 pr-12 rounded-full text-slate-50 w-full" type="text" placeholder="">
+            <button class="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-400 flex items-center justify-center" (click)="this.username = inputUsername.value">
+                <i class="fa-solid fa-chevron-right text-slate-50"></i>
+            </button>
+        </div>
     </div>
 </div>
