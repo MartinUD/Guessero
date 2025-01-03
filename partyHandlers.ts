@@ -20,7 +20,6 @@ export function handleCreateParty(socket: WebSocket, payload: { partyId: string;
   const party = new Party(partyId);
 
   member.username = username;
-  member.id = partyId;
   member.party = party;
 
   socket.send(JSON.stringify({type: "party_created"}));
