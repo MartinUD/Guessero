@@ -3,6 +3,7 @@ export interface PartyMember {
   socket: WebSocket;
   username?: string;
   isHost?: boolean;
+  party?: Party;
 }
 
 export class Party {
@@ -30,17 +31,20 @@ export class Party {
   }
 
   removeMember(memberId: string): void {
-    const index = this.members.findIndex((member) => member.id === memberId);
+    const memberIndex = this.members.findIndex((member) => member.id === memberId);
 
-    if (index === -1) {
+    if (memberIndex === -1) {
       throw new Error("Member not found");
     }
-    
-    const [removedMember] = this.members.splice(index, 1);
-    
+
+    const [removedMember] = this.members.splice(memberIndex, 1);
+
     if (removedMember.isHost && this.members.length > 0) {
       this.members[0].isHost = true;
     }
+
+    removedMember.socket.send(JSON.stringify({ type: "party_left", partyId: this.partyId }));
+    this.members.forEach((member) => member.socket.send(JSON.stringify({ type: "member_left", memberId })));
   }
 
   getMembers(): PartyMember[] {
@@ -72,5 +76,9 @@ export class Party {
         member.socket.send(JSON.stringify({ type: "chat_message", username: member.username, message }));
       }
     });
+  }
+
+  getPartyId(): string {
+    return this.partyId;
   }
 }
