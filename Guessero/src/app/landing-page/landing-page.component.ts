@@ -12,9 +12,8 @@ import { CommonModule } from '@angular/common'; // Add this for ngFor
   styleUrl: './landing-page.component.css'
 })
 export class LandingPageComponent implements OnInit, OnDestroy {
-    partyId = 'badadan';
+    partyId = '';
     username = '';
-    Private = false;
     private subscriptions: Subscription[] = []
     parties: any[] = []; 
     searchingParties = false;
@@ -35,10 +34,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.subscriptions.forEach(sub => sub.unsubscribe());
     }
   
-    createParty(inputPartyID: string) {
+    createParty(inputPartyID: string, partyVisability: string) {
       this.partyId = inputPartyID;
+      let isVisable = partyVisability !== 'public';
       if (this.partyId && this.username) {
-        this.BasicService.createParty(this.partyId, this.username);
+        this.BasicService.createParty(this.partyId, this.username, isVisable);
       }
       this.listParties();
     }

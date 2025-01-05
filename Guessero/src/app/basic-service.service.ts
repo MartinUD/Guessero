@@ -63,17 +63,19 @@ export class BasicService {
     };
   }
 
-  createParty(partyId: string, username: string): void {
+  createParty(partyId: string, username: string, isVisable: boolean): void {
     this.socket.send(JSON.stringify({
       type: 'create_party',
-      payload: { partyId, username }
+      partyId: partyId,
+      username: username,
+      isPrivate: isVisable     
     }));
   }
 
   leaveParty(partyId: string): void {
     this.socket.send(JSON.stringify({
       type: 'leave_party',
-      payload: { partyId }
+      partyId: partyId
     }));
     this.currentParty$.next(null);
     this.members$.next([]);
