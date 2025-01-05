@@ -22,7 +22,7 @@ export interface PartyMessage {
 })
 export class BasicService {
   private socket: WebSocket;
-  private parties$ = new BehaviorSubject<string[]>([]);
+  public parties$ = new BehaviorSubject<string[]>([]);
   private members$ = new BehaviorSubject<Omit<PartyMember, "id">[]>([]);
   private currentParty$ = new BehaviorSubject<string | null>(null);
 
@@ -81,7 +81,7 @@ export class BasicService {
 
   listParties(): void {
     this.socket.send(JSON.stringify({
-      type: 'party_list'
+      type: 'list_parties'
     })); 
   }
 } 

@@ -14,14 +14,22 @@ import { CommonModule } from '@angular/common'; // Add this for ngFor
 export class LandingPageComponent implements OnInit, OnDestroy {
     partyId = 'badadan';
     username = '';
-    partyIsPrivate = false;
+    Private = false;
     private subscriptions: Subscription[] = []
+    parties: any[] = []; 
+    searchingParties = false;
   
     constructor(private BasicService: BasicService) {}
   
     ngOnInit() {
-
-    }
+      const partiesSub = this.BasicService.parties$.subscribe(parties => {
+          this.parties = parties;
+      });
+      this.subscriptions.push(partiesSub);
+      
+      // Initial load of parties
+      this.listParties();
+  }
   
     ngOnDestroy() {
       this.subscriptions.forEach(sub => sub.unsubscribe());
@@ -32,6 +40,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.partyId && this.username) {
         this.BasicService.createParty(this.partyId, this.username);
       }
+      this.listParties();
     }
   
     listParties() {
