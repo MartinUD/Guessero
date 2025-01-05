@@ -2,10 +2,9 @@ import { Party, PartyMember } from "./partyStructure.ts";
 
 const parties = new Map<string, Party>();
 
-export function handleCreateParty(socket: WebSocket, payload: { partyId: string; username: string }, member: PartyMember) {
-  const { partyId, username} = payload;
+export function handleCreateParty(socket: WebSocket, partyId: string, username: string, isPrivate: boolean, member: PartyMember) {
 
-  if (!payload || !payload.partyId || !payload.username) {
+  if (!partyId || !username || isPrivate === undefined) {
     socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
     return;
   }
@@ -14,10 +13,10 @@ export function handleCreateParty(socket: WebSocket, payload: { partyId: string;
     return;
   }
   if(member.party) {
-    member.party.removeMember(member.id);
+    handleLeaveParty(socket, member);
   }
 
-  const party = new Party(partyId);
+  const party = new Party(partyId, isPrivate);
 
   member.username = username;
   member.party = party;
@@ -32,12 +31,10 @@ export function handleCreateParty(socket: WebSocket, payload: { partyId: string;
   );
 }
 
-export function handleJoinParty(socket: WebSocket, payload: { partyId: string, username: string }, member: PartyMember) {
-
-  const { partyId, username } = payload;
+export function handleJoinParty(socket: WebSocket, partyId: string, username: string, member: PartyMember) {
   const party = parties.get(partyId);
 
-  if (!payload || !payload.partyId || !payload.username) {
+  if (!partyId || !username) {
     socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
     return;
   }
@@ -50,7 +47,7 @@ export function handleJoinParty(socket: WebSocket, payload: { partyId: string, u
     return;
   }
   if(member.party) {
-    member.party.removeMember(member.id);
+    handleLeaveParty(socket, member);
   }
   
   member.username = username;
@@ -88,15 +85,14 @@ export function handleLeaveParty(socket: WebSocket, member: PartyMember) {
 }
 
 export function handleListParties(socket: WebSocket) {
-  const activeParties = [...parties.keys()];
-  socket.send(JSON.stringify({type: "party_list", parties: activeParties,}),);
+  const publicParties = [...parties.values()].filter(party => party.isPartyPrivate() === false).map(party => party.getPartyId());
+  socket.send(JSON.stringify({type: "party_list", parties: publicParties,}),);
 }
 
-export function handleChatMessage(socket: WebSocket, payload: { partyId: string, message: string }, member: PartyMember) {
-  const { message } = payload;
+export function handleChatMessage(socket: WebSocket, chatMessage: string , member: PartyMember) {
   const party = member.party;
 
-  if (!payload || !payload.partyId || !payload.message) {
+  if (!chatMessage) {
     socket.send(JSON.stringify({ type: "error", message: "Invalid payload" }));
     return;
   }
@@ -105,5 +101,5 @@ export function handleChatMessage(socket: WebSocket, payload: { partyId: string,
     return;
   }
 
-  party.chatMessage(member.id, message);
+  party.chatMessage(member.id, chatMessage);
 }

@@ -11,10 +11,10 @@ export class Party {
   private members: PartyMember[];
   private isPrivate: boolean;
 
-  constructor(partyId: string) {
+  constructor(partyId: string, isPrivate: boolean) {
     this.partyId = partyId;
     this.members = [];
-    this.isPrivate = true;
+    this.isPrivate = isPrivate;
   }
 
   addMember(member: PartyMember): void {
@@ -27,7 +27,7 @@ export class Party {
 
     this.members.push(member);
     
-    member.socket.send(JSON.stringify({type: "party_joined", partyId: this.partyId, members: this.listMembers(),}))
+    member.socket.send(JSON.stringify({type: "party_joined", partyId: this.partyId, members: this.listMembers(), isPrivate: this.isPrivate}))
   }
 
   removeMember(memberId: string): void {
@@ -80,5 +80,9 @@ export class Party {
 
   getPartyId(): string {
     return this.partyId;
+  }
+
+  isPartyPrivate(): boolean {
+    return this.isPrivate;
   }
 }
