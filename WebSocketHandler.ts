@@ -1,10 +1,18 @@
 import { PartyMember } from "./partyStructure.ts";
-import { handleCreateParty,
+
+import {
+  gameIsSubstringInCategory,
+  gameStart
+} from "./gameHandlers.ts";
+
+import {
+  handleCreateParty,
   handleJoinParty,
   handleLeaveParty,
   handleListParties,
   handleChatMessage
- } from "./partyHandlers.ts";
+} from "./partyHandlers.ts";
+
 
 const websocketUserMap = new WeakMap<WebSocket, PartyMember>();
 
@@ -43,23 +51,31 @@ Deno.serve((_req) => {
       }
       switch (message.type) {
         case "create_party":
-          handleCreateParty(socket, message.partyId,message.username, message.isPrivate, user); 
+          handleCreateParty(socket, message.partyId, message.username, message.isPrivate, user);
           break;
 
         case "join_party":
-          handleJoinParty(socket, message.partyId, message.username, user); 
+          handleJoinParty(socket, message.partyId, message.username, user);
           break;
 
         case "leave_party":
-          handleLeaveParty(socket, user); 
+          handleLeaveParty(socket, user);
           break;
 
         case "list_parties":
-          handleListParties(socket); 
+          handleListParties(socket);
           break;
-        
+
         case "chat_message":
-          handleChatMessage(socket, message.chat_message, user); 
+          handleChatMessage(socket, message.chat_message, user);
+          break;
+
+        case "game_start":
+          gameStart(socket, message.game_duration, user);
+          break;
+
+        case "game_guess":
+          gameIsSubstringInCategory(socket, message.category, message.answer, user);
           break;
 
         default:

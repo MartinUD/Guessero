@@ -12,7 +12,7 @@ export function handleCreateParty(socket: WebSocket, partyId: string, username: 
     socket.send(JSON.stringify({ type: "error", message: "Unable to create party" }));
     return;
   }
-  if(member.party) {
+  if (member.party) {
     handleLeaveParty(socket, member);
   }
 
@@ -20,9 +20,10 @@ export function handleCreateParty(socket: WebSocket, partyId: string, username: 
 
   member.username = username;
   member.party = party;
+  member.isHost = true;
 
-  socket.send(JSON.stringify({type: "party_created"}));
-  party.addMember({ id: member.id, username: member.username, socket: socket});
+  socket.send(JSON.stringify({ type: "party_created" }));
+  party.addMember(member, username);
 
   parties.set(partyId, party);
 
@@ -46,14 +47,14 @@ export function handleJoinParty(socket: WebSocket, partyId: string, username: st
     socket.send(JSON.stringify({ type: "error", message: "Username already taken" }));
     return;
   }
-  if(member.party) {
+  if (member.party) {
     handleLeaveParty(socket, member);
   }
-  
+
   member.username = username;
   member.party = party;
 
-  party.addMember({ id: member.id, username: member.username, socket: socket })
+  party.addMember(member, username);
 }
 
 export function handleLeaveParty(socket: WebSocket, member: PartyMember) {
@@ -86,10 +87,10 @@ export function handleLeaveParty(socket: WebSocket, member: PartyMember) {
 
 export function handleListParties(socket: WebSocket) {
   const publicParties = [...parties.values()].filter(party => party.isPartyPrivate() === false).map(party => party.getPartyId());
-  socket.send(JSON.stringify({type: "party_list", parties: publicParties,}),);
+  socket.send(JSON.stringify({ type: "party_list", parties: publicParties, }),);
 }
 
-export function handleChatMessage(socket: WebSocket, chatMessage: string , member: PartyMember) {
+export function handleChatMessage(socket: WebSocket, chatMessage: string, member: PartyMember) {
   const party = member.party;
 
   if (!chatMessage) {

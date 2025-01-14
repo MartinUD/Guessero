@@ -4,30 +4,39 @@ export interface PartyMember {
   username?: string;
   isHost?: boolean;
   party?: Party;
+  categoryAnswers?: Record<string, string>;
 }
 
 export class Party {
   private partyId: string;
   private members: PartyMember[];
   private isPrivate: boolean;
+  private isGameStarted: boolean;
+  private currentCategories: string[];
+  private gameTimer: number | null = null;
 
   constructor(partyId: string, isPrivate: boolean) {
     this.partyId = partyId;
     this.members = [];
     this.isPrivate = isPrivate;
+    this.isGameStarted = false;
+    this.currentCategories = [];
   }
 
-  addMember(member: PartyMember): void {
+  addMember(member: PartyMember, username: string): void {
     if (this.members.length >= 4) {
       member.socket.send(JSON.stringify({ type: "error", message: "Party is full" }));
+      return;
     }
     if (this.members.length === 0) {
       member.isHost = true;
     }
 
     this.members.push(member);
-    
-    member.socket.send(JSON.stringify({type: "party_joined", partyId: this.partyId, members: this.listMembers(), isPrivate: this.isPrivate}))
+    member.party = this;
+    member.username = username
+
+    member.socket.send(JSON.stringify({ type: "party_joined", partyId: this.partyId, members: this.listMembers(), isPrivate: this.isPrivate }))
   }
 
   removeMember(memberId: string): void {
@@ -84,5 +93,41 @@ export class Party {
 
   isPartyPrivate(): boolean {
     return this.isPrivate;
+  }
+
+  isGameInProgress(): boolean {
+    return this.isGameStarted;
+  }
+
+  startGame(duration: number): void {
+    this.isGameStarted = true;
+    this.currentCategories = this.getRandomCategories();
+    this.partyMessage(JSON.stringify({ type: "game_started", categories: this.currentCategories }))
+    this.startGameTimer(duration);
+  }
+
+  endGame(): void {
+    this.isGameStarted = false;
+    this.currentCategories = [];
+    this.partyMessage(JSON.stringify({ type: "game_ended" }));
+  }
+
+  private startGameTimer(duration: number): void {
+    this.gameTimer = setTimeout(() => {
+      this.endGame();
+    }, duration);
+  }
+
+  //<NOTE> Make amount of categories dynamic when more available
+  getRandomCategories(): string[] {
+    const availableCategories = Deno.readTextFileSync("./gameData/categories.json");
+    const parsedCategories = JSON.parse(availableCategories);
+    const randomCategories = new Set<string>();
+
+    while (randomCategories.size < 3) {
+      const randomIndex = Math.floor(Math.random() * parsedCategories.categories.length);
+      randomCategories.add(parsedCategories.categories[randomIndex]);
+    }
+    return Array.from(randomCategories);
   }
 }

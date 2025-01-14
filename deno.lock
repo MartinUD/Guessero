@@ -6,7 +6,9 @@
     "jsr:@std/assert@1": "1.0.9",
     "jsr:@std/bytes@1": "1.0.4",
     "jsr:@std/bytes@^1.0.2": "1.0.4",
+    "jsr:@std/bytes@^1.0.3": "1.0.4",
     "jsr:@std/crypto@1": "1.0.3",
+    "jsr:@std/csv@*": "1.0.4",
     "jsr:@std/encoding@1": "1.0.5",
     "jsr:@std/encoding@^1.0.5": "1.0.5",
     "jsr:@std/http@1": "1.0.12",
@@ -14,6 +16,7 @@
     "jsr:@std/io@0.224": "0.224.9",
     "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/path@1": "1.0.8",
+    "jsr:@std/streams@^1.0.8": "1.0.8",
     "npm:@types/node@*": "22.5.4",
     "npm:path-to-regexp@6.2.1": "6.2.1",
     "npm:wordnet-db@*": "3.1.14"
@@ -56,6 +59,12 @@
     "@std/crypto@1.0.3": {
       "integrity": "a2a32f51ddef632d299e3879cd027c630dcd4d1d9a5285d6e6788072f4e51e7f"
     },
+    "@std/csv@1.0.4": {
+      "integrity": "aa351de654b10b8a407275b61f588863b9538027fd47aed90dd9e7f54ab5bdc0",
+      "dependencies": [
+        "jsr:@std/streams"
+      ]
+    },
     "@std/encoding@1.0.5": {
       "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
     },
@@ -79,6 +88,12 @@
     },
     "@std/path@1.0.8": {
       "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
+    },
+    "@std/streams@1.0.8": {
+      "integrity": "b41332d93d2cf6a82fe4ac2153b930adf1a859392931e2a19d9fabfb6f154fb3",
+      "dependencies": [
+        "jsr:@std/bytes@^1.0.3"
+      ]
     }
   },
   "npm": {
