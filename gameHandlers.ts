@@ -19,6 +19,7 @@ export function gameStart(socket: WebSocket, duration: number, user: PartyMember
 }
 
 export function gameIsSubstringInCategory(socket: WebSocket, category: string, substring: string, user: PartyMember): void {
+  
     if (!user.party) {
         socket.send(JSON.stringify({ type: "error", message: "Not in party" }));
         return;
@@ -32,6 +33,17 @@ export function gameIsSubstringInCategory(socket: WebSocket, category: string, s
 
     const isFullMatch = categoryData.words.some((word: string) => word === substring);
     const isPartialMatch = categoryData.words.some((word: string) => word.startsWith(substring));
+    
+    if (!user.categoryAnswers) {
+      user.categoryAnswers = [];
+  }
 
+  const existingAnswerIndex = user.categoryAnswers.findIndex(answer => answer.category === category);
+
+  if(existingAnswerIndex !== -1) {
+    user.categoryAnswers[existingAnswerIndex] = { category, answer: substring, isComplete: isFullMatch };
+  } else { 
+    user.categoryAnswers.push({ category, answer: substring, isComplete: isFullMatch });
+  }
     socket.send(JSON.stringify({ type: "game_guess_response", category, isFullMatch, isPartialMatch }));
 }

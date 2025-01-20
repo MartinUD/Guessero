@@ -4,7 +4,7 @@ export interface PartyMember {
   username?: string;
   isHost?: boolean;
   party?: Party;
-  categoryAnswers?: Record<string, string>;
+  categoryAnswers?: { category: string, answer: string, isComplete: boolean }[];
 }
 
 export class Party {
